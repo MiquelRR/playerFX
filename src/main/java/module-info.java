@@ -3,6 +3,7 @@ module com.example.playerfx {
     requires javafx.fxml;
     requires javafx.media;
     requires javafx.graphics;
+    requires javafx.base;
 
 
     opens com.example.playerfx to javafx.fxml;

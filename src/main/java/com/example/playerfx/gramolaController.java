@@ -41,7 +41,7 @@ public class gramolaController {
     private Boolean repeat;
 
     static {
-        chooser.setInitialDirectory(new File("/home/miquel/Música")); // ruta carpeta
+        chooser.setInitialDirectory(new File("./src/main/resources/com/example/playerfx/music/")); // ruta carpeta
         chooser.setTitle("Selecciona un Archivo de sonido");
         chooser.getExtensionFilters().addAll(new ExtensionFilter("Audio",
                 "*.*"),
@@ -49,7 +49,8 @@ public class gramolaController {
     }
 
     static File file;
-
+    private Image loopImage = new Image(getClass().getResourceAsStream("images/bucle.png"));
+    private Image noLoopImage = new Image(getClass().getResourceAsStream("images/bucleOff.png"));
     private Image playImg = new Image(getClass().getResourceAsStream("images/play.png"));
     private Image pauseImg = new Image(getClass().getResourceAsStream("images/pause.png"));
     private Image muteImage = new Image(getClass().getResourceAsStream("images/mute.png"));
@@ -83,7 +84,8 @@ public class gramolaController {
 
     }
 
-    // ***************** */
+    @FXML
+    private ImageView imgBucle;
 
     @FXML
     private ImageView imgPlay;
@@ -131,10 +133,7 @@ public class gramolaController {
                 if (player != null)
                     player.stop();
                 player = new MediaPlayer(media);
-                System.out.println("x".repeat(100) + ((double) (volumeLevel / 5)));
-                player.setVolume(.8);
             } catch (MediaException e) {
-                System.out.println("m".repeat(150) + e.getMessage());
                 e.printStackTrace();
             }
             play = false;
@@ -142,9 +141,8 @@ public class gramolaController {
             welcome = false;
             hiderBox.setVisible(false);
             player.totalDurationProperty().addListener(ob -> setDuration(player));
-            player.setOnEndOfMedia(() -> {
-                endOfTrack();
-            });
+            player.setOnEndOfMedia(() -> endOfTrack());
+            animaStep = 0;
 
         }
     }
@@ -158,7 +156,6 @@ public class gramolaController {
     @FXML
     private void setDuration(MediaPlayer player) {
         durationSecs = player.totalDurationProperty().getValue().toSeconds();
-        addedMetadata();
 
     }
 
@@ -201,48 +198,53 @@ public class gramolaController {
 
     @FXML
     void repeatSw(ActionEvent event) {
-
+        repeat = !repeat;
+        imgBucle.setImage((repeat) ? loopImage : noLoopImage);
+        player.setMute(mute);
+        hideVolumeSlider(null);
     }
 
     @FXML
     void toEnd(ActionEvent event) {
-        
+
         Double currentTime = player.getCurrentTime().toSeconds();
         if (currentTime != null && durationSecs != null) {
-            //Duration newTime = new Duration((currentTime+10)*1000);
-            Duration newTime = new Duration((50+10)*1000);
-            System.out.println("HOlaa "+Track.toMmSs(newTime.toSeconds()));
-            //player.stop();
+            // Duration newTime = new Duration((currentTime+10)*1000);
+            Duration newTime = new Duration((50 + 10) * 1000);
+            /// System.out.println("HOlaa "+Track.toMmSs(newTime.toSeconds()));
+            // player.stop();
             player.seek(newTime);
-            if(play) player.play();
+            if (play)
+                player.play();
         }
-        
-        
-        //timeSlider.setValue(1D);
-        
-        ///actTime.setText(Track.toMmSs(durationSecs));
-        //playSwitch(null);
 
     }
 
     @FXML
     void toInit(ActionEvent event) {
         player.stop();
-        
+
         player.seek(Duration.ZERO);
-        //player.seek(new Duration((50+10)*1000));
+        // player.seek(new Duration((50+10)*1000));
         if (play)
             player.play();
     }
 
     @FXML
     void editVolume(MouseEvent event) {
-        System.out.println(Double.toString(volumeSlider.getValue()));
+        // System.out.println(Double.toString(volumeSlider.getValue()));
         volumeLevel = (int) volumeSlider.getValue();
-        imgVolume.setImage(volumeImages[volumeLevel]);
-        System.out.println("v".repeat(100) + ((double) (volumeLevel / 5D)));
-        player.setVolume((double) (volumeLevel / 5D));
-        // showDialog(Double.toString(volSlider.getValue()));
+        if (volumeLevel > 0) {
+            mute = true;
+            muteSwitch(null);
+            imgVolume.setImage(volumeImages[volumeLevel]);
+            // System.out.println("v".repeat(100) + ((double) (volumeLevel / 5D)));
+            player.setVolume((double) (volumeLevel / 5D));
+            // showDialog(Double.toString(volSlider.getValue()));
+        } else {
+            mute = false;
+            muteSwitch(null);
+        }
 
     }
 
@@ -263,16 +265,19 @@ public class gramolaController {
         if (welcome) {
             infoText.setText(infoTrack.getInstantString());
         } else {
+
             if (play) {
                 animaStep++;
+                if (animaStep == 10)
+                    addedMetadata();
                 if (animaStep == 20)
                     volumeSlider.setVisible(false);
-                ;
                 infoText.setText(infoTrack.getInstantString());
                 if (mute)
                     imgVolume.setImage(muteImage);
                 else
                     imgVolume.setImage(volumeAnim[((animaStep) % (volumeLevel + 1))]);
+                System.out.println("-".repeat(100) + "  :" + (animaStep) % (volumeLevel + 1));
             }
         }
 

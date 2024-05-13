@@ -37,9 +37,9 @@
       </Button>
       <Button fx:id="repeatOsNot" layoutX="8.0" layoutY="540.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#repeatSw" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: rgba(255, 0, 0, 0);" text="Button" textFill="#bc2a2a00">
          <graphic>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="imgBucle" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@images/bucleOff.png" />
+                  <Image url="@images/bucle.png" />
                </image>
             </ImageView>
          </graphic>
@@ -81,16 +81,8 @@
          </graphic>
       </Button>
       <Slider fx:id="timeSlider" blockIncrement="0.05" layoutX="319.0" layoutY="557.0" max="1.0" onDragDetected="#editSeconds" prefHeight="16.0" prefWidth="225.0" />
-      <Label fx:id="actTime" alignment="CENTER_RIGHT" layoutX="278.0" layoutY="555.0" prefHeight="20.0" prefWidth="38.0" text="00:00" textFill="WHITE">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label fx:id="trackLength" layoutX="544.0" layoutY="555.0" prefHeight="20.0" prefWidth="38.0" text="00:00" textFill="WHITE">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
+      <Label fx:id="actTime" alignment="CENTER_RIGHT" layoutX="278.0" layoutY="555.0" prefHeight="20.0" prefWidth="38.0" text="00:00" textFill="WHITE" />
+      <Label fx:id="trackLength" layoutX="544.0" layoutY="555.0" prefHeight="20.0" prefWidth="38.0" text="00:00" textFill="WHITE" />
       <Rectangle fx:id="hiderBox" arcHeight="5.0" arcWidth="5.0" fill="#360f06b2" height="70.0" layoutY="530.0" stroke="#0a0301b2" strokeType="INSIDE" strokeWidth="0.0" width="600.0" />
       <Slider fx:id="volumeSlider" blockIncrement="1.0" layoutX="230.0" layoutY="390.0" majorTickUnit="1.0" max="5.0" minorTickCount="0" onMouseExited="#hideVolumeSlider" onMouseReleased="#editVolume" orientation="VERTICAL" showTickMarks="true" snapToTicks="true" value="1.0" />
    </children>

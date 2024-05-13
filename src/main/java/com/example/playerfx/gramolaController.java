@@ -27,15 +27,18 @@ import javafx.util.Duration;
 public class gramolaController {
     static FileChooser chooser = new FileChooser();
     private Boolean play;
+    private Boolean mute;
     static Track actTrack;
-    private Double volume;
-    private MediaPlayer player;
+    private Integer volumeLevel;
+    private static MediaPlayer player;
     private Media media;
     private Integer infoChars = 53;
     private static ScrollText infoTrack;
     private static Timeline timeline;
     private Double durationSecs;
-    private Boolean wellcome;
+    private Boolean welcome;
+    private int animaStep;
+    private Boolean repeat;
 
     static {
         chooser.setInitialDirectory(new File("/home/miquel/Música")); // ruta carpeta
@@ -49,9 +52,44 @@ public class gramolaController {
 
     private Image playImg = new Image(getClass().getResourceAsStream("images/play.png"));
     private Image pauseImg = new Image(getClass().getResourceAsStream("images/pause.png"));
+    private Image muteImage = new Image(getClass().getResourceAsStream("images/mute.png"));
+    private Image volumeImage = new Image(getClass().getResourceAsStream("images/volume.png"));
+    private Image volume1 = new Image(getClass().getResourceAsStream("images/volume1.png"));
+    private Image volume2 = new Image(getClass().getResourceAsStream("images/volume2.png"));
+    private Image volume3 = new Image(getClass().getResourceAsStream("images/volume3.png"));
+    private Image volume4 = new Image(getClass().getResourceAsStream("images/volume4.png"));
+    private Image volume5 = new Image(getClass().getResourceAsStream("images/volume5.png"));
+    private Image[] volumeImages = new Image[] { muteImage, volume1, volume2, volume3, volume4, volume5 };
+    private Image volumeA0 = new Image(getClass().getResourceAsStream("images/volumeA0.png"));
+    private Image volumeA1 = new Image(getClass().getResourceAsStream("images/volumeA1.png"));
+    private Image volumeA2 = new Image(getClass().getResourceAsStream("images/volumeA2.png"));
+    private Image volumeA3 = new Image(getClass().getResourceAsStream("images/volumeA3.png"));
+    private Image volumeA4 = new Image(getClass().getResourceAsStream("images/volumeA4.png"));
+    private Image volumeA5 = new Image(getClass().getResourceAsStream("images/volumeA5.png"));
+    private Image[] volumeAnim = new Image[] { volumeA0, volumeA1, volumeA2, volumeA3, volumeA4, volumeA5 };
+
+    // *********** */
+
+    @FXML
+    void hideVolumeSlider(MouseEvent event) {
+        volumeSlider.setVisible(false);
+
+    }
+
+    @FXML
+    void showVolumeSlider(MouseEvent event) {
+        volumeSlider.setVisible(true);
+        animaStep = 0;
+
+    }
+
+    // ***************** */
 
     @FXML
     private ImageView imgPlay;
+
+    @FXML
+    private ImageView imgVolume;
 
     @FXML
     private ImageView background;
@@ -81,7 +119,7 @@ public class gramolaController {
     private Slider timeSlider;
 
     @FXML
-    private Slider volSlider;
+    private Slider volumeSlider;
 
     @FXML
     void chooseFile(ActionEvent event) {
@@ -93,18 +131,28 @@ public class gramolaController {
                 if (player != null)
                     player.stop();
                 player = new MediaPlayer(media);
-                player.setVolume(volume);
+                System.out.println("x".repeat(100) + ((double) (volumeLevel / 5)));
+                player.setVolume(.8);
             } catch (MediaException e) {
                 System.out.println("m".repeat(150) + e.getMessage());
                 e.printStackTrace();
             }
             play = false;
             playSwitch(event);
-            wellcome=false;
+            welcome = false;
             hiderBox.setVisible(false);
             player.totalDurationProperty().addListener(ob -> setDuration(player));
+            player.setOnEndOfMedia(() -> {
+                endOfTrack();
+            });
 
         }
+    }
+
+    @FXML
+    private void endOfTrack() {
+        play = repeat;
+        toInit(null);
     }
 
     @FXML
@@ -144,22 +192,57 @@ public class gramolaController {
     }
 
     @FXML
+    void muteSwitch(ActionEvent event) {
+        mute = !mute;
+        imgVolume.setImage((mute) ? muteImage : volumeImages[volumeLevel]);
+        player.setMute(mute);
+        hideVolumeSlider(null);
+    }
+
+    @FXML
     void repeatSw(ActionEvent event) {
 
     }
 
     @FXML
     void toEnd(ActionEvent event) {
+        
+        Double currentTime = player.getCurrentTime().toSeconds();
+        if (currentTime != null && durationSecs != null) {
+            //Duration newTime = new Duration((currentTime+10)*1000);
+            Duration newTime = new Duration((50+10)*1000);
+            System.out.println("HOlaa "+Track.toMmSs(newTime.toSeconds()));
+            //player.stop();
+            player.seek(newTime);
+            if(play) player.play();
+        }
+        
+        
+        //timeSlider.setValue(1D);
+        
+        ///actTime.setText(Track.toMmSs(durationSecs));
+        //playSwitch(null);
 
     }
 
     @FXML
     void toInit(ActionEvent event) {
-
+        player.stop();
+        
+        player.seek(Duration.ZERO);
+        //player.seek(new Duration((50+10)*1000));
+        if (play)
+            player.play();
     }
 
     @FXML
     void editVolume(MouseEvent event) {
+        System.out.println(Double.toString(volumeSlider.getValue()));
+        volumeLevel = (int) volumeSlider.getValue();
+        imgVolume.setImage(volumeImages[volumeLevel]);
+        System.out.println("v".repeat(100) + ((double) (volumeLevel / 5D)));
+        player.setVolume((double) (volumeLevel / 5D));
+        // showDialog(Double.toString(volSlider.getValue()));
 
     }
 
@@ -170,29 +253,48 @@ public class gramolaController {
 
     @FXML
     private void refresh() {
-        if (play || wellcome ) {
-            infoText.setText(infoTrack.getInstantString());
+        if (player != null) {
             Double currentTime = player.getCurrentTime().toSeconds();
             if (currentTime != null && durationSecs != null) {
                 actTime.setText(Track.toMmSs(currentTime));
                 timeSlider.setValue(currentTime / durationSecs);
             }
         }
+        if (welcome) {
+            infoText.setText(infoTrack.getInstantString());
+        } else {
+            if (play) {
+                animaStep++;
+                if (animaStep == 20)
+                    volumeSlider.setVisible(false);
+                ;
+                infoText.setText(infoTrack.getInstantString());
+                if (mute)
+                    imgVolume.setImage(muteImage);
+                else
+                    imgVolume.setImage(volumeAnim[((animaStep) % (volumeLevel + 1))]);
+            }
+        }
+
     }
 
     @FXML
     void initialize() {
-        wellcome=true;
+        repeat = true;
+        animaStep = 0;
+        welcome = true;
         timeline = new Timeline(new KeyFrame(Duration.millis(150), event -> {
             refresh();
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
-        volSlider.setVisible(false);
+        volumeSlider.setVisible(false);
         App.st.setResizable(false);
         hiderBox.setVisible(true);
         play = false;
-        volume = 0.8;
+        mute = false;
+        volumeLevel = 1;
+        imgVolume.setImage(volumeImages[volumeLevel]);
         infoTrack = new ScrollText(infoChars,
                 "Seleccione un archivo de música para empezar la reproducción, tenga en cuenta que el regetón no es un género musical, es más bien un tipo de ruido");
     }

@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -36,7 +37,7 @@ public class gramolaController {
     private static ScrollText infoTrack;
     private static Timeline timeline;
     private Double durationSecs;
-    private Boolean welcome;
+    private Boolean noProgressRefresh;
     private int animaStep;
     private Boolean repeat;
 
@@ -138,7 +139,8 @@ public class gramolaController {
             }
             play = false;
             playSwitch(event);
-            welcome = false;
+            editVolume(null);
+            noProgressRefresh = false;
             hiderBox.setVisible(false);
             player.totalDurationProperty().addListener(ob -> setDuration(player));
             player.setOnEndOfMedia(() -> endOfTrack());
@@ -156,13 +158,13 @@ public class gramolaController {
     @FXML
     private void setDuration(MediaPlayer player) {
         durationSecs = player.totalDurationProperty().getValue().toSeconds();
-
+        trackLength.setText(Track.toMmSs(durationSecs));
+        addedMetadata();
     }
 
     @FXML
     private void addedMetadata() {
         actTrack = new Track(media.getSource(), media.getMetadata(), durationSecs);
-        System.out.println(">".repeat(150) + actTrack.getDurationString());
         trackLength.setText(actTrack.getDurationString());
         infoTrack = new ScrollText(infoChars, actTrack.getAllinfo());
 
@@ -178,14 +180,22 @@ public class gramolaController {
         alert.showAndWait();
     }
 
+    void playIfPlaying() {
+        play = !play;
+        playSwitch(null);
+    }
+
     @FXML
     void playSwitch(ActionEvent event) {
         play = !play;
-        imgPlay.setImage((play) ? pauseImg : playImg);
-        if (play)
+        if (play) {
+            imgPlay.setImage(pauseImg);
             player.play();
-        else
+        } else {
+            imgPlay.setImage(playImg);
             player.pause();
+        }
+
     }
 
     @FXML
@@ -193,6 +203,10 @@ public class gramolaController {
         mute = !mute;
         imgVolume.setImage((mute) ? muteImage : volumeImages[volumeLevel]);
         player.setMute(mute);
+        if (!mute && volumeLevel == 0) {
+            volumeSlider.setValue(2);
+            editVolume(null);
+        }
         hideVolumeSlider(null);
     }
 
@@ -206,78 +220,76 @@ public class gramolaController {
 
     @FXML
     void toEnd(ActionEvent event) {
-
+        // en un unica cancion "toEnd no tiene sentido, cambio la funcionalidad del
+        // botón a -> avance 30 secs"
         Double currentTime = player.getCurrentTime().toSeconds();
         if (currentTime != null && durationSecs != null) {
-            // Duration newTime = new Duration((currentTime+10)*1000);
-            Duration newTime = new Duration((50 + 10) * 1000);
-            /// System.out.println("HOlaa "+Track.toMmSs(newTime.toSeconds()));
-            // player.stop();
+            Duration newTime = new Duration((currentTime + 30) * 1000);
             player.seek(newTime);
-            if (play)
-                player.play();
+            playIfPlaying();
         }
-
     }
 
     @FXML
     void toInit(ActionEvent event) {
         player.stop();
-
         player.seek(Duration.ZERO);
-        // player.seek(new Duration((50+10)*1000));
-        if (play)
-            player.play();
+        playIfPlaying();
     }
 
     @FXML
     void editVolume(MouseEvent event) {
-        // System.out.println(Double.toString(volumeSlider.getValue()));
-        volumeLevel = (int) volumeSlider.getValue();
-        if (volumeLevel > 0) {
-            mute = true;
-            muteSwitch(null);
-            imgVolume.setImage(volumeImages[volumeLevel]);
-            // System.out.println("v".repeat(100) + ((double) (volumeLevel / 5D)));
-            player.setVolume((double) (volumeLevel / 5D));
-            // showDialog(Double.toString(volSlider.getValue()));
-        } else {
-            mute = false;
-            muteSwitch(null);
+        if (player != null) {
+            volumeLevel = (int) volumeSlider.getValue();
+            if (volumeLevel > 0) {
+                mute = true;
+                muteSwitch(null);
+                imgVolume.setImage(volumeImages[volumeLevel]);
+                player.setVolume((double) (volumeLevel / 5D));
+            } else {
+                mute = false;
+                muteSwitch(null);
+            }
         }
 
     }
 
     @FXML
-    void editSeconds(MouseEvent event) {
+    void editSeekMode(MouseEvent event){
+        noProgressRefresh = true;
+    }
 
+    @FXML
+    void editSeekDone(MouseEvent event) {
+        Double point= timeSlider.getValue();
+        if (durationSecs != null) {
+            Duration newTime = new Duration(durationSecs*point * 1000);
+            player.seek(newTime);
+            playIfPlaying();
+        }
+        noProgressRefresh = false;
+        
     }
 
     @FXML
     private void refresh() {
-        if (player != null) {
-            Double currentTime = player.getCurrentTime().toSeconds();
-            if (currentTime != null && durationSecs != null) {
-                actTime.setText(Track.toMmSs(currentTime));
-                timeSlider.setValue(currentTime / durationSecs);
-            }
+        animaStep++;
+        infoText.setText(infoTrack.getInstantString());
+        if (animaStep == 20)
+            volumeSlider.setVisible(false);
+        if (play) {
+            if (mute)
+                imgVolume.setImage(muteImage);
+            else
+                imgVolume.setImage(volumeAnim[((animaStep) % (volumeLevel + 1))]);
         }
-        if (welcome) {
-            infoText.setText(infoTrack.getInstantString());
-        } else {
-
-            if (play) {
-                animaStep++;
-                if (animaStep == 10)
-                    addedMetadata();
-                if (animaStep == 20)
-                    volumeSlider.setVisible(false);
-                infoText.setText(infoTrack.getInstantString());
-                if (mute)
-                    imgVolume.setImage(muteImage);
-                else
-                    imgVolume.setImage(volumeAnim[((animaStep) % (volumeLevel + 1))]);
-                System.out.println("-".repeat(100) + "  :" + (animaStep) % (volumeLevel + 1));
+        if (!noProgressRefresh) {
+            if (player != null) {
+                Double currentTime = player.getCurrentTime().toSeconds();
+                if (currentTime != null && durationSecs != null) {
+                    actTime.setText(Track.toMmSs(currentTime));
+                    timeSlider.setValue(currentTime / durationSecs);
+                }
             }
         }
 
@@ -287,19 +299,18 @@ public class gramolaController {
     void initialize() {
         repeat = true;
         animaStep = 0;
-        welcome = true;
+        noProgressRefresh = true;
         timeline = new Timeline(new KeyFrame(Duration.millis(150), event -> {
             refresh();
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
         volumeSlider.setVisible(false);
+        volumeSlider.setValue(1);
         App.st.setResizable(false);
         hiderBox.setVisible(true);
         play = false;
         mute = false;
-        volumeLevel = 1;
-        imgVolume.setImage(volumeImages[volumeLevel]);
         infoTrack = new ScrollText(infoChars,
                 "Seleccione un archivo de música para empezar la reproducción, tenga en cuenta que el regetón no es un género musical, es más bien un tipo de ruido");
     }

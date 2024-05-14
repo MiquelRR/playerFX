@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
-import javafx.util.Duration;
+
 
 public class Track {
 
@@ -78,47 +76,47 @@ public class Track {
         }
         this.duration = duration;
 
-        if(this.title == null){
-            String str=fileURI.replace("/", "\\");
+        if (this.title == null) {
+            String str = fileURI.replace("/", "\\");
             String st[] = str.split("\\\\");
-            this.title=st[(st.length-1)];
+            this.title = st[(st.length - 1)];
         }
-        
+
         discoteca.put(fileURI, this);
         int sz = playedList.size();
-        if (sz > 1 && !playedList.get(sz - 1).equals(fileURI)) {
+        if (playedList.isEmpty() || !playedList.get(sz-1).equals(fileURI)) {
             playedList.add(fileURI);
-
-        }
+            System.out.println(fileURI);
+        } 
 
     }
 
     public String getAllinfo() {
         String allInfo = "";
+        if (this.title != null)
+            allInfo += "Pista: " + this.title + " ";
         if (this.album_artist != null)
-            allInfo += "Artista:" + this.album_artist + " ";
+            allInfo += "Artista: " + this.album_artist + " ";
         if (this.album != null)
-            allInfo += "Album:" + this.album + " ";
+            allInfo += "Album: " + this.album + " ";
         if (this.artist != null)
             allInfo += "Intérprete:" + this.artist + " ";
         if (this.composer != null)
-            allInfo += "Compositor:" + this.composer + " ";
+            allInfo += "Compositor: " + this.composer + " ";
         if (this.year != null)
-            allInfo += "Año:" + this.year + " ";
+            allInfo += "Año: " + this.year + " ";
         if (this.disc_count != null)
-            allInfo += "Discos tot,:" + this.disc_count + " ";
+            allInfo += "Discos tot.: " + this.disc_count + " ";
         if (this.disc_number != null)
-            allInfo += "Disco:" + this.disc_number + " ";
+            allInfo += "Disco no.: " + this.disc_number + " ";
         if (this.duration != null)
-            allInfo += "Duración:" + toMmSs(this.duration) + " ";
+            allInfo += "Duración: " + toMmSs(this.duration) + " ";
         if (this.genre != null)
-            allInfo += "Género:" + this.genre + " ";
-        if (this.title != null)
-            allInfo += "Título:" + this.title + " ";
+            allInfo += "Género: " + this.genre + " ";
         if (this.track_count != null)
-            allInfo += "Traks:" + this.track_count + " ";
+            allInfo += "Traks tot.: " + this.track_count + " ";
         if (this.track_number != null)
-            allInfo += "Track:" + this.track_number + " ";
+            allInfo += "Track no.: " + this.track_number + " ";
         return allInfo;
     }
 
@@ -161,10 +159,9 @@ public class Track {
             return "00:00";
     }
 
-    public Double getDuration(){
+    public Double getDuration() {
         return duration;
     }
-
 
     public String getGenre() {
         return genre;

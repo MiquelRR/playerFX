@@ -1,4 +1,4 @@
-# DINOS javafx exercice
+# PLAYER javafx exercice
 
 This practice consist on develop a single-file local music player.
 
@@ -18,4 +18,4 @@ Happy playing!
 
 ![musicPlayer](screenShots/main.png)
 
-images  music are public domain.
+Image & music files used are public domain.

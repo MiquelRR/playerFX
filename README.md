@@ -1,27 +1,21 @@
 # DINOS javafx exercice
 
-This is an exercice to improve our skills in handling the [javaFX](https://openjfx.io/) framework. 
-As usual, i've developed a bit more than exercice specks, such as contextual warnings and buttons.
-
+This practice consist on develop a single-file local music player.
 
 
 ## Develope Notes
 
-The integrity of the MVC is kept clear as well as completely separating data access from the model, to make the application migratable to other data sources.
-I have implemented a class that generates log files and in this case it is being used for data access.
+The issues of this practice are to manage listeners  and to develop a spected UI where all elements do that the spected to.
+Seems easy, but not  trivial. In addition, i've developed some animation,  as seen the needing of refresh of the status playing slider.
+
+Requirements propose to implement a Track class,those ive added a list od tracked files and a map to store their metadata.
+
+Happy playing!
+
 
 ## ScreenShoots
 
-![menu](screenShoots/menu.png)
 
-image credits to @SARAROOM_111
+![musicPlayer](screenShots/main.png)
 
-![contextual buttons](screenShoots/dinoTablecontextualButtons.png)
-
-![some alerts](screenShoots/some_alerts.png)
-
-![new atracction](screenShoots/newAtracction.png)
-
-![map selector](screenShoots/mapSelector.png)
-
-[Effects Video](screenShoots/effectsOverview.webm)
+images  music are public domain.

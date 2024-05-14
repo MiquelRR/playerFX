@@ -19,6 +19,7 @@ public class App extends Application {
         st=stage;
         scene = new Scene(loadFXML("gramola"),600 ,600);
         stage.setScene(scene);
+        stage.setTitle("DAMe música! MiquelRR");
         stage.show();
     }
 

@@ -282,6 +282,8 @@ public class gramolaController {
                 imgVolume.setImage(muteImage);
             else
                 imgVolume.setImage(volumeAnim[((animaStep) % (volumeLevel + 1))]);
+        } else {
+            imgVolume.setImage(volumeImages[volumeLevel]);
         }
         if (!noProgressRefresh) {
             if (player != null) {

@@ -15,7 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -55,7 +54,6 @@ public class gramolaController {
     private Image playImg = new Image(getClass().getResourceAsStream("images/play.png"));
     private Image pauseImg = new Image(getClass().getResourceAsStream("images/pause.png"));
     private Image muteImage = new Image(getClass().getResourceAsStream("images/mute.png"));
-    private Image volumeImage = new Image(getClass().getResourceAsStream("images/volume.png"));
     private Image volume1 = new Image(getClass().getResourceAsStream("images/volume1.png"));
     private Image volume2 = new Image(getClass().getResourceAsStream("images/volume2.png"));
     private Image volume3 = new Image(getClass().getResourceAsStream("images/volume3.png"));

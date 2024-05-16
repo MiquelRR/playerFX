@@ -299,6 +299,7 @@ public class gramolaController {
 
     @FXML
     void initialize() {
+        volumeLevel=5;
         repeat = true;
         animaStep = 0;
         noProgressRefresh = true;

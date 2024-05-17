@@ -13,7 +13,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.effect.SepiaTone;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -26,7 +26,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Duration;
 
 public class gramolaController {
-    static SepiaTone sepiaTone = new SepiaTone();
+    ColorAdjust colorAdjust = new ColorAdjust();
     static FileChooser chooser = new FileChooser();
     private Boolean play;
     private Boolean mute;
@@ -282,9 +282,9 @@ public class gramolaController {
                 imgVolume.setImage(muteImage);
             else
                 imgVolume.setImage(volumeAnim[((animaStep) % (volumeLevel + 1))]);
-                System.out.println(((animaStep/(animaStep/10))%10));
-                sepiaTone.setLevel(((animaStep%10))*.05-(animaStep/(animaStep/20)%20));
-                background.setEffect(sepiaTone);
+                Double ceroToOne=Math.abs(((animaStep%40)/20)-(animaStep%20)*.05);
+                colorAdjust.setSaturation(ceroToOne-.83);
+                background.setEffect(colorAdjust);
         } else {
             imgVolume.setImage(volumeImages[volumeLevel]);
         }
